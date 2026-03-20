@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Лабораторна 7 - JS, API, DOM</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 600px;
+        }
+        section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        input {
+            margin-bottom: 10px;
+            padding: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+
+        /* === Стилі для Завдання 5 */
+        #elid {
+            width: 100px;
+            height: 100px;
+            background-color: #3b82f6; /* Синій колір */
+            margin-top: 15px;
+            /* transition відповідає за плавність руху */
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Лабораторна робота 7</h1>
+
+<section>
+    <h3>Завдання 3: Пошук коду округу (API)</h3>
+    <input type="text" id="countyInput" placeholder="Наприклад: Baldwin County, Alabama">
+    <button id="searchBtn">Знайти код</button>
+    <p id="result" style="font-weight: bold; color: green;"></p>
+</section>
+
+<section>
+    <h3>Завдання 4: Валідація форми</h3>
+    <form id="userForm">
+        <label>Ім'я:</label>
+        <input type="text" id="first_name" placeholder="Введіть ім'я">
+
+        <label>Прізвище:</label>
+        <input type="text" id="last_name" placeholder="Введіть прізвище">
+
+        <label>Email:</label>
+        <input type="email" id="email" placeholder="Введіть email">
+
+        <button type="submit">Відправити форму</button>
+    </form>
+</section>
+
+<section>
+    <h3>Завдання 5: Анімація елемента</h3>
+    <button id="btnLeft">Вліво</button>
+    <button id="btnRight">Вправо</button>
+    <div id="elid"></div>
+</section>
+
+<script src="script.js"></script>
+
+</body>
+</html>
