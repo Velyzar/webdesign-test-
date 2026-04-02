@@ -2,6 +2,10 @@
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/ui', '@vueuse/nuxt'],
 
+  colorMode: {
+    preference: 'light'
+  }, // <--- ОСЬ ТУТ БРАКУВАЛО ЗАКРИВАЮЧОЇ ДУЖКИ І КОМИ!
+
   devtools: {
     enabled: true
   },
