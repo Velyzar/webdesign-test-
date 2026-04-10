@@ -7,6 +7,9 @@
       <NuxtLink to="/table" class="hover:text-orange-400 transition-colors" active-class="text-orange-400">
          Таблиця
       </NuxtLink>
+      <NuxtLink to="/checkout" class="hover:text-orange-400 transition-colors" active-class="text-orange-400">
+        Оплата
+      </NuxtLink>
     </nav>
 
     <NuxtPage />
