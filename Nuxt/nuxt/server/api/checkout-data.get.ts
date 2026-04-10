@@ -1,4 +1,4 @@
-export default defineEventHandler((event) => {
+export default defineEventHandler(() => {
   // дані тарифу
   return {
     planName: 'Team - Annual',

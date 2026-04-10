@@ -8,6 +8,7 @@
          Таблиця
       </NuxtLink>
       <NuxtLink to="/checkout" class="hover:text-orange-400 transition-colors" active-class="text-orange-400">
+        // додав як вкладку
         Оплата
       </NuxtLink>
     </nav>

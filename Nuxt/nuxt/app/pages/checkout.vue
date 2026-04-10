@@ -122,7 +122,7 @@ async function sendData() {
       method: 'POST',
       body: form.value
     })
-    // Показуємо алерт щоб було видно що працює
+    // Показуємо алерт щоб було видно що працює.
     alert(response.message)
   } catch (error) {
     alert('Сталася помилка при відправці')
