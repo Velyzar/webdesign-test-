@@ -1,3 +1,36 @@
+<script setup>
+import { ref } from 'vue'
+import { useSubscriptionStore } from '~/stores/useSubscriptionStore'
+
+const store = useSubscriptionStore()
+const plan = store.selectedPlan
+
+if (!plan) {
+  navigateTo('/table') // якщо зайшли випадково, кидаємо назад на картки
+}
+
+const form = ref({
+  cardNumber: '',
+  cardExp: '',
+  cardCvc: '',
+  name: 'dev4 dev4',
+  address: '',
+  agreed: false
+})
+
+async function sendData() {
+  try {
+    const response = await $fetch('/api/subscription/create', {
+      method: 'POST',
+      body: form.value
+    })
+    alert(response.message)
+  } catch (error) {
+    alert('Помилка при відправці')
+    console.error(error)
+  }
+}
+</script>
 <template>
   <div class="bg-white min-h-screen text-gray-800 pb-10">
     <Head>
@@ -102,31 +135,3 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
- // тягнемо дані з апі
-const { data: plan } = await useFetch('/api/checkout-data')
-
-const form = ref({
-  cardNumber: '',
-  cardExp: '',
-  cardCvc: '',
-  name: 'dev4 dev4',
-  address: '',
-  agreed: false
-})
-  // Функція для відправки
-async function sendData() {
-  try {
-    const response = await $fetch('/api/subscription/create', {
-      method: 'POST',
-      body: form.value
-    })
-    // Показуємо алерт щоб було видно що працює.
-    alert(response.message)
-  } catch (error) {
-    alert('Сталася помилка при відправці')
-    console.error(error)
-  }
-}
-</script>

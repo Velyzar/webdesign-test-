@@ -1,3 +1,77 @@
+<script setup>
+import { ref, computed } from 'vue'
+import { useSubscriptionStore } from '~/stores/useSubscriptionStore'
+
+// 1. Отримуємо дані для таблиці
+const { data } = await useFetch('/api/products')
+
+// 2. Підключаємо стор Pinia
+const store = useSubscriptionStore()
+
+// 3. Функція для кнопки (зберігаємо товар у стор і переходимо на оплату)
+function buyPlan(item) {
+  const planInfo = {
+    planName: item.title,
+    price: item.price,
+    oldPrice: item.price + 50,
+    newPrice: item.price,
+    savings: 189,
+    features: [
+      `Brand: ${item.brand || 'No brand'}`,
+      `Category: ${item.category}`,
+      item.description
+    ]
+  }
+
+  store.setPlan(planInfo)
+  navigateTo('/checkout')
+}
+
+// 4. Логіка таблиці (пошук, пагінація)
+const search = ref('')
+const page = ref(1)
+const pageSize = 5
+const sort = ref({ column: 'title', direction: 'asc' })
+
+// ДОДАВ КОЛОНКУ 'actions' ДЛЯ КНОПКИ
+const columns = [
+  { id: 'thumbnail', accessorKey: 'thumbnail', header: 'Фото' },
+  { id: 'title', accessorKey: 'title', header: 'Назва' },
+  { id: 'description', accessorKey: 'description', header: 'Опис' },
+  { id: 'price', accessorKey: 'price', header: 'Ціна' },
+  { id: 'rating', accessorKey: 'rating', header: 'Оцінка' },
+  { id: 'category', accessorKey: 'category', header: 'Категорія' },
+  { id: 'actions', header: 'Дія' } // <--- Наша нова колонка
+]
+
+const filteredData = computed(() => {
+  let arr = data.value?.products || []
+
+  if (search.value) {
+    arr = arr.filter(p =>
+      p.title.toLowerCase().includes(search.value.toLowerCase()) ||
+      p.description.toLowerCase().includes(search.value.toLowerCase())
+    )
+  }
+
+  if (sort.value.column) {
+    arr = [...arr].sort((a, b) => {
+      const aVal = a[sort.value.column]
+      const bVal = b[sort.value.column]
+      if (aVal === bVal) return 0
+      const res = aVal > bVal ? 1 : -1
+      return sort.value.direction === 'desc' ? -res : res
+    })
+  }
+  return arr
+})
+
+const paginatedRows = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return filteredData.value.slice(start, start + pageSize)
+})
+</script>
+
 <template>
   <div class="bg-gray-100 p-8 font-sans text-gray-800 min-h-screen">
     <Head>
@@ -6,7 +80,6 @@
     </Head>
 
     <div class="max-w-7xl mx-auto">
-
       <div class="flex justify-between items-center mb-4 text-sm text-gray-600">
         <div class="flex items-center gap-6">
           <div class="flex items-center gap-2">
@@ -24,7 +97,6 @@
       </div>
 
       <div class="bg-white rounded-lg shadow border border-gray-200 overflow-x-auto">
-
         <UTable
           :data="paginatedRows"
           :columns="columns"
@@ -60,6 +132,12 @@
             <div class="w-48 truncate mx-auto" :title="row.original.description">{{ row.original.description }}</div>
           </template>
 
+          <template #actions-cell="{ row }">
+            <button @click="buyPlan(row.original)" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-1 px-3 rounded text-sm transition-colors">
+              Buy
+            </button>
+          </template>
+
         </UTable>
       </div>
 
@@ -67,56 +145,6 @@
         <div>Записів знайдено: {{ filteredData.length }}</div>
         <UPagination v-model="page" :page-count="pageSize" :total="filteredData.length" />
       </div>
-
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, computed } from 'vue'
-
-const { data } = await useFetch('/api/products')
-
-const search = ref('')
-const page = ref(1)
-const pageSize = 5
-const sort = ref({ column: 'title', direction: 'asc' })
-
-// НОВИЙ ФОРМАТ КОЛОНОК (TanStack Table)
-const columns = [
-  { id: 'thumbnail', accessorKey: 'thumbnail', header: 'Фото' },
-  { id: 'title', accessorKey: 'title', header: 'Назва' },
-  { id: 'description', accessorKey: 'description', header: 'Опис' },
-  { id: 'price', accessorKey: 'price', header: 'Ціна' },
-  { id: 'rating', accessorKey: 'rating', header: 'Оцінка' },
-  { id: 'category', accessorKey: 'category', header: 'Категорія' }
-]
-
-const filteredData = computed(() => {
-  let arr = data.value?.products || []
-
-  if (search.value) {
-    arr = arr.filter(p =>
-      p.title.toLowerCase().includes(search.value.toLowerCase()) ||
-      p.description.toLowerCase().includes(search.value.toLowerCase())
-    )
-  }
-
-  // Сортування
-  if (sort.value.column) {
-    arr = [...arr].sort((a, b) => {
-      const aVal = a[sort.value.column]
-      const bVal = b[sort.value.column]
-      if (aVal === bVal) return 0
-      const res = aVal > bVal ? 1 : -1
-      return sort.value.direction === 'desc' ? -res : res
-    })
-  }
-  return arr
-})
-
-const paginatedRows = computed(() => {
-  const start = (page.value - 1) * pageSize
-  return filteredData.value.slice(start, start + pageSize)
-})
-</script>

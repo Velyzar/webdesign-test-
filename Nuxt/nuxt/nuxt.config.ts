@@ -1,10 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', '@nuxt/ui', '@vueuse/nuxt'],
+  // ОСЬ ТУТ ДОДАЛИ @pinia/nuxt
+  modules: ['@nuxt/eslint', '@nuxt/ui', '@vueuse/nuxt', '@pinia/nuxt'],
 
   colorMode: {
     preference: 'light'
-  }, // <--- ОСЬ ТУТ БРАКУВАЛО ЗАКРИВАЮЧОЇ ДУЖКИ І КОМИ!
+  },
 
   devtools: {
     enabled: true
