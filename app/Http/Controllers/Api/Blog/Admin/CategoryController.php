@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\Blog\Admin;
 
 use App\Models\BlogCategory;
-use Illuminate\Http\Request;
+use App\Http\Requests\BlogCategoryUpdateRequest;
+use App\Http\Requests\BlogCategoryCreateRequest;
 use Illuminate\Support\Str;
+
 
 class CategoryController extends BaseController
 {
@@ -21,33 +23,30 @@ class CategoryController extends BaseController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BlogCategoryCreateRequest $request)
     {
-        $data = $request->all();
+        $data = $request->input(); // отримаємо масив даних, які надійшли з форми
 
-        // Перевірка або автоматична генерація slug
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
+        if (empty($data['slug'])) { // якщо псевдонім порожній
+            $data['slug'] = Str::slug($data['title']); // генеруємо псевдонім
         }
 
-        // Створення нового запису в БД
-        $item = BlogCategory::create($data);
+        $item = (new BlogCategory())->create($data); // створюємо об'єкт і додаємо в БД
 
         if ($item) {
             return [
                 'success' => true,
-                'message' => 'Успішно створено',
-                'id' => $item->id
+                'message' => 'Успішно збережено'
             ];
         } else {
-            return ['message' => 'Помилка створення запису'];
+            return ['message' => 'Помилка збереження'];
         }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(BlogCategoryUpdateRequest $request, string $id)
     {
         $item = BlogCategory::find($id);
         if (empty($item)) {
