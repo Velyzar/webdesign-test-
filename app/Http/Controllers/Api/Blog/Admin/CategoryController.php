@@ -6,17 +6,27 @@ use App\Models\BlogCategory;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
 use Illuminate\Support\Str;
-
+use App\Repositories\BlogCategoryRepository;
 
 class CategoryController extends BaseController
 {
+    /**
+     * Додаємо конструктор для автоматичного підключення репозиторію
+     */
+    public function __construct(private BlogCategoryRepository $blogCategoryRepository)
+    {
+        // parent::__construct();
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        // dd(__METHOD__); // Можна розкоментувати для перевірки
-        $paginator = BlogCategory::paginate(5);
+        // Оптимізували запит через репозиторій (забираємо лише 3 колонки замість усіх)
+        // $paginator = BlogCategory::paginate(5);
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
+
         return $paginator;
     }
 
@@ -48,7 +58,9 @@ class CategoryController extends BaseController
      */
     public function update(BlogCategoryUpdateRequest $request, string $id)
     {
-        $item = BlogCategory::find($id);
+        // Оптимізували: замінили BlogCategory::find($id) на метод репозиторію
+        $item = $this->blogCategoryRepository->getEdit($id);
+
         if (empty($item)) {
             return ['message' => "Запис id=[{$id}] не знайдено"];
         }
