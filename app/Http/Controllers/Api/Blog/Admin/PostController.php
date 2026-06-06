@@ -6,6 +6,8 @@ use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogPostUpdateRequest;
 use Illuminate\Support\Str;
+use App\Models\BlogPost;
+use App\Http\Requests\BlogPostCreateRequest;
 
 class PostController extends BaseController
 {
@@ -30,9 +32,17 @@ class PostController extends BaseController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(\Illuminate\Http\Request $request)
+    public function store(BlogPostCreateRequest $request)
     {
-        //
+        $data = $request->input(); // отримаємо масив даних, які надійшли з форми
+
+        $item = (new BlogPost())->create($data); // створюємо об'єкт і додаємо в БД
+
+        if ($item) {
+            return ['success' => 'Успішно збережено'];
+        } else {
+            return ['msg' => 'Помилка збереження'];
+        }
     }
 
     /**
@@ -58,6 +68,26 @@ class PostController extends BaseController
             ];
         } else {
             return ['message' => 'Помилка збереження'];
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $result = BlogPost::destroy($id); // софт деліт, запис лишається в базі з командою deleted_at
+
+        if ($result) {
+            return [
+                'success' => true,
+                'message' => "Запис id=[{$id}] успішно видалено"
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Помилка видалення запису'
+            ];
         }
     }
 }
