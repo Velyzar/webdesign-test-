@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Blog\Admin;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogPostUpdateRequest;
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 class PostController extends BaseController
@@ -43,21 +42,14 @@ class PostController extends BaseController
     {
         $item = $this->blogPostRepository->getEdit($id);
 
-        if (empty($item)) { //якщо ід не знайдено
+        if (empty($item)) {
             return ['message' => "Запис id=[{$id}] не знайдено"];
         }
 
-        $data = $request->all(); //отримаємо масив даних, які надійшли з форми
+        $data = $request->all();
 
-        if (empty($data['slug'])) { //якщо псевдонім порожній
-            $data['slug'] = Str::slug($data['title']); //генеруємо псевдонім
-        }
-
-        if (empty($item->published_at) && !empty($data['is_published'])) { //якщо поле published_at порожнє і нам прийшло 1 в ключі is_published
-            $data['published_at'] = Carbon::now(); //генеруємо поточну дату
-        }
-
-        $result = $item->update($data); //оновлюємо дані об'єкта і зберігаємо в БД
+        // Вся магія тепер відбувається автоматично в Observer перед оновленням
+        $result = $item->update($data);
 
         if ($result) {
             return [
@@ -67,13 +59,5 @@ class PostController extends BaseController
         } else {
             return ['message' => 'Помилка збереження'];
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
