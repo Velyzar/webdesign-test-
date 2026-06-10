@@ -5,28 +5,27 @@ namespace App\Http\Controllers\Api\Blog\Admin;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogPostUpdateRequest;
-use Illuminate\Support\Str;
-use App\Models\BlogPost;
 use App\Http\Requests\BlogPostCreateRequest;
+use App\Models\BlogPost;
+use App\Jobs\BlogPostAfterCreateJob;
+use App\Jobs\BlogPostAfterDeleteJob;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class PostController extends BaseController
 {
-    // Впроваджуємо обидва репозиторії через конструктор
+    use DispatchesJobs;
+
     public function __construct(
         private BlogPostRepository $blogPostRepository,
         private BlogCategoryRepository $blogCategoryRepository
-    ) {
-        // parent::__construct();
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $paginator = $this->blogPostRepository->getAllWithPaginate();
-
-        return $paginator;
+        return $this->blogPostRepository->getAllWithPaginate();
     }
 
     /**
@@ -34,11 +33,13 @@ class PostController extends BaseController
      */
     public function store(BlogPostCreateRequest $request)
     {
-        $data = $request->input(); // отримаємо масив даних, які надійшли з форми
-
-        $item = (new BlogPost())->create($data); // створюємо об'єкт і додаємо в БД
+        $data = $request->input();
+        $item = (new BlogPost())->create($data);
 
         if ($item) {
+            $job = new BlogPostAfterCreateJob($item);
+            $this->dispatch($job);
+
             return ['success' => 'Успішно збережено'];
         } else {
             return ['msg' => 'Помилка збереження'];
@@ -51,21 +52,15 @@ class PostController extends BaseController
     public function update(BlogPostUpdateRequest $request, string $id)
     {
         $item = $this->blogPostRepository->getEdit($id);
-
         if (empty($item)) {
             return ['message' => "Запис id=[{$id}] не знайдено"];
         }
 
         $data = $request->all();
-
-        // Вся магія тепер відбувається автоматично в Observer перед оновленням
         $result = $item->update($data);
 
         if ($result) {
-            return [
-                'success' => true,
-                'message' => 'Успішно збережено'
-            ];
+            return ['success' => true, 'message' => 'Успішно збережено'];
         } else {
             return ['message' => 'Помилка збереження'];
         }
@@ -76,9 +71,12 @@ class PostController extends BaseController
      */
     public function destroy(string $id)
     {
-        $result = BlogPost::destroy($id); // софт деліт, запис лишається в базі з командою deleted_at
+        $result = BlogPost::destroy($id);
 
         if ($result) {
+            // Запуск завдання із затримкою у 20 секунд (згідно з інструкцією)
+            BlogPostAfterDeleteJob::dispatch($id)->delay(20);
+
             return [
                 'success' => true,
                 'message' => "Запис id=[{$id}] успішно видалено"
