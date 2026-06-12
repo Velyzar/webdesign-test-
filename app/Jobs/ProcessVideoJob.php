@@ -24,4 +24,9 @@ class ProcessVideoJob implements ShouldQueue
     {
         //
     }
+
+    public function processVideo()
+    {
+        ProcessVideoJob::dispatch();
+    }
 }
