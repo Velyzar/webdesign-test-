@@ -7,6 +7,8 @@ use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
 use Illuminate\Support\Str;
 use App\Repositories\BlogCategoryRepository;
+// ІНТЕГРАЦІЯ ЛАБ 17: Підключаємо ресурс для категорій
+use App\Http\Resources\Api\Blog\Admin\CategoryResource;
 
 class CategoryController extends BaseController
 {
@@ -23,11 +25,9 @@ class CategoryController extends BaseController
      */
     public function index()
     {
-        // Оптимізували запит через репозиторій (забираємо лише 3 колонки замість усіх)
-        // $paginator = BlogCategory::paginate(5);
         $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
 
-        return $paginator;
+        return CategoryResource::collection($paginator);
     }
 
     /**
@@ -36,7 +36,6 @@ class CategoryController extends BaseController
     public function store(BlogCategoryCreateRequest $request)
     {
         $data = $request->input(); // отримаємо масив даних, які надійшли з форми
-
 
         $item = (new BlogCategory())->create($data); // створюємо об'єкт і додаємо в БД
 
@@ -55,7 +54,6 @@ class CategoryController extends BaseController
      */
     public function update(BlogCategoryUpdateRequest $request, string $id)
     {
-        // Оптимізували: замінили BlogCategory::find($id) на метод репозиторію
         $item = $this->blogCategoryRepository->getEdit($id);
 
         if (empty($item)) {

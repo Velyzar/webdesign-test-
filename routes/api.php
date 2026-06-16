@@ -39,4 +39,8 @@ Route::prefix('digging_deeper')->group(function () {
 
     Route::get('prepare-catalog', [\App\Http\Controllers\DiggingDeeperController::class, 'prepareCatalog'])
         ->name('digging_deeper.prepareCatalog');
+    Route::get('/blog/posts/{id}', [\App\Http\Controllers\Api\Blog\PostController::class, 'show']);
+
+
 });
+

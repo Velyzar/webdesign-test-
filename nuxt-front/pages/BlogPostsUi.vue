@@ -2,14 +2,16 @@
   <div class="p-6 container mx-auto">
     <h2 class="text-xl font-bold mb-4">Список постів (Компоненти Nuxt UI)</h2>
 
-    <UTable :rows="posts" :columns="columns" :loading="pending">
-      <template #category-data="{ row }">
-        {{ row.category ? row.category.title : '—' }}
-      </template>
-      <template #user-data="{ row }">
-        {{ row.user ? row.user.name : '—' }}
-      </template>
-    </UTable>
+      <UTable :rows="posts" :columns="columns">
+          <template #title-data="{ row }">
+              <NuxtLink
+                  :to="`/posts/${row.id}`"
+                  class="text-blue-500 hover:text-blue-600 hover:underline font-semibold cursor-pointer"
+              >
+                  {{ row.title }}
+              </NuxtLink>
+          </template>
+      </UTable>
 
     <div class="flex justify-end mt-4" v-if="totalPosts > 0">
       <UPagination
